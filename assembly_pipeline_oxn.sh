@@ -2,7 +2,7 @@
 
 set -e
 
-while getopts ":i:r:t:" opt; do
+while getopts ":i:r:t" opt; do
   case $opt in
     i) reads="$OPTARG"
     ;;
