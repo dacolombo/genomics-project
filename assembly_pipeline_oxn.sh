@@ -52,14 +52,14 @@ bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${reference%%.*}.fa
 #----------#
 
 echo "Performing the sampling...";
-samples=(0.15 0.3 0.6 0.9);
+samples=(5000 10000 20000 30000);
 
 mkdir samples;
 
-for percentage in "{samples[@]}";
+for size in "${samples[@]}";
 do
-  seqtk sample -s1000 ${prefix}_mapped.fastq.gz $percentage > samples/${prefix}_${percentage}.fastq;
-  gzip samples/${prefix}_${percentage}.fastq
+  seqtk sample -s1000 ${prefix}_mapped.fastq.gz $size > samples/${prefix}_$((size/1000))K.fastq;
+  gzip samples/${prefix}_$((size/1000))K.fastq
 done;
 
 echo "Assembling with canu...";
@@ -69,10 +69,10 @@ cd canu;
 
 genomeSize=$(tail -n +2 ${reference} | tr -d "\n" | wc -m)
 
-for percentage in "{samples[@]}";
+for size in "${samples[@]}";
 do
-  canu -d "canu${percentage}" -p "${prefix}_${percentage}" genomeSize=${genomeSize} -nanopore ../samples/${prefix}_${percentage}.fastq.gz;
-  FastaSeqStats canu${percentage}/${prefix}_${percentage}.contigs.fasta > canu_${percentage}_stats.txt;
+  canu -d "canu$((size/1000))K" -p "${prefix}_$((size/1000))K" genomeSize=${genomeSize} -nanopore ../samples/${prefix}_$((size/1000))K.fastq.gz;
+  FastaSeqStats canu$((size/1000))K/${prefix}_$((size/1000))K.contigs.fasta > canu_$((size/1000))K_stats.txt;
 done;
 
 
