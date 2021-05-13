@@ -8,15 +8,15 @@ set -e
 Help()
 {
   echo "Description:"
-  echo "Script to trim a sequence in a single-FASTA file given a position and the side to remove"
+  echo "  Script to trim a sequence in a single-FASTA file given a position and the side to remove"
   echo
   echo "Syntax:"
-  echo "SingleFastaTrim -i <input_fasta_file> -p <position> -s <side_to_trim>"
+  echo "  SingleFastaTrim -i <input_fasta_file> -p <position> -s <side_to_trim>"
   echo
   echo "Options:"
-  echo "-i <input_fasta_file>		input fasta file (must be in .fasta format)"
-  echo "-p <position>                   position to trim the sequence. The count starts from 1 for both sides. The base at <position> is trimmed aswell"
-  echo "-s <side_to_trim>               side to trim. Accepted values are 'right' 'left' 'r' 'l'"
+  echo "  -i <input_fasta_file>		input fasta file (must be in .fasta format)"
+  echo "  -p <position>                   position to trim the sequence. The count starts from 1 for both sides. The base at <position> is trimmed aswell"
+  echo "  -s <side_to_trim>               side to trim. Accepted values are 'right' 'left' 'r' 'l'"
 
 }
 
@@ -47,6 +47,15 @@ while getopts ":i:p:s:h" opt; do
     ;;
   esac
 done
+
+
+# Print help and exit if no option is passed
+if [ "$#" -eq 0 ]
+then
+  Help
+  exit
+fi
+
 
 prefix=${input%%.*}
 

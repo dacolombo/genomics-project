@@ -2,7 +2,35 @@
 
 set -e
 
-while getopts ":i:r:t" opt; do
+########################################
+###########     Help     ###############
+########################################
+Help()
+{
+  echo "Description:"
+  echo "  Pipeline to trim, align to a reference and assemble Oxford Nanopore reads."
+  echo
+  echo "Syntax:"
+  echo "  AssemblyOxN.sh -i <input_fastq_file> -r <reference_fasta_file> -t <number_of_threads>"
+  echo
+  echo "Options:"
+  echo "  -i <input_fastq_file>		input fastq file containing the OxN reads (can be in .fastq or .fastq.gz format)"
+  echo "  -r <reference_fasta_file>       fasta file containing the reference genome"
+  echo "  -t <number_of_threads>          number of threads to use"
+
+}
+
+
+
+########################################
+###########     Main     ###############
+########################################
+
+#-------------#
+# Get options #
+#-------------#
+
+while getopts ":i:r:t:h" opt; do
   case $opt in
     i) reads="$OPTARG"
     ;;
@@ -10,10 +38,22 @@ while getopts ":i:r:t" opt; do
     ;;
     t) threads="$OPTARG"
     ;;
-    \?) echo "Invalid option -$OPTARG" >&2
+    h) Help
+       exit
+    ;;
+    \?) echo "Invalid option -$OPTARG"
+        exit
     ;;
   esac
 done
+
+
+if [ "$#" -eq 0 ]
+then
+  Help
+  exit
+fi
+
 
 prefix=${reads%%.*}
 
