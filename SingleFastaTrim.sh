@@ -84,6 +84,9 @@ then
     sequence=$(tail -n +2 ${input} | tr -d '\n')
     echo ${sequence:$((position - 1))} > /tmp/trimmed.txt
 
+  else
+    echo "Wrong argument passed as side"
+    exit
   fi
 
 else
