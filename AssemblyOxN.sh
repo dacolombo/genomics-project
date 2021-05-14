@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euxo pipefail
 
 ########################################
 ###########     Help     ###############
@@ -71,10 +71,9 @@ porechop --threads=$threads -i ${reads} -o ${prefix}_trimmed.fastq.gz
 #---------#
 
 echo "Mapping reads and sorting the bam file..."
-minimap2 -t $threads -ax map-ont $referemce ${prefix}_trimmed.fastq.gz\\
-| samtools view -@ $threads -b -o ${prefix}.bam -;
+minimap2 -t $threads -ax map-ont $reference ${prefix}_trimmed.fastq.gz | samtools view -@ $threads -b -o ${prefix}.bam -;
 samtools sort -@ $threads -o ${prefix}.sort.bam ${prefix}.bam;
-rm ${prefix}.bam
+rm ${prefix}.bam;
 
 echo "Extracting mapped reads..."
 samtools view -@ $threads -b -F 4 ${prefix}.sort.bam -o ${prefix}_mapped.sort.bam;
@@ -107,7 +106,7 @@ echo "Assembling with canu...";
 mkdir canu;
 cd canu;
 
-genomeSize=$(tail -n +2 ${reference} | tr -d "\n" | wc -m)
+genomeSize=$(tail -n +2 ${reference} | tr -d "\n" | wc -m);
 
 for size in "${samples[@]}";
 do
