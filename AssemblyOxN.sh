@@ -83,7 +83,7 @@ bedtools bamtofastq -i ${prefix}_mapped.sort.bam -fq ${prefix}_mapped.fastq;
 gzip ${prefix}_mapped.fastq;
 
 echo "Computing coverage..."
-samtools faidx -@ $threads ${reference}
+samtools faidx ${reference}
 bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${reference%%.*}.fai > ${prefix}_mapped.covbed.txt;
 
 #----------#
