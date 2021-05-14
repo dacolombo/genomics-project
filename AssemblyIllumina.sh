@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euxo pipefail;
 
 
 ########################################
@@ -30,7 +30,7 @@ Help()
 ########################################
 
 
-samples=(25000 55000 11000 192500 275000 410000 550000)
+samples=(25000 55000 11000 192500 275000 410000 550000);
 
 
 
@@ -68,33 +68,33 @@ done
 #--------------#
 
 # Print help and exit if no option is passed
-if [ "$#" -eq 0 ]
+if [ "$#" -eq 0 ];
 then
-  Help
-  exit
-fi
+  Help;
+  exit;
+fi;
 
 
 # Print error message and exit if the reads are in a wrong format
-if { [ "${reads1#*.}" != "fastq" ] && [ "${reads1#*.}" != "fastq.gz" ]; } || { [ "${reads2#*.}" != "fastq" ] && [ "${reads2#*.}" != "fastq.gz" ]; }
+if { [ "${reads1#*.}" != "fastq" ] && [ "${reads1#*.}" != "fastq.gz" ]; } || { [ "${reads2#*.}" != "fastq" ] && [ "${reads2#*.}" != "fastq.gz" ]; };
 then
-    echo "Wrong format of input reads"
-    exit
-fi
+    echo "Wrong format of input reads";
+    exit;
+fi;
 
 
 # Print error message and exit if the reference is in a wrong format
-if [ "${reference##*.}" != "fasta" ] && [ "${reference##*.}" != "fa" ]
+if [ "${reference##*.}" != "fasta" ] && [ "${reference##*.}" != "fa" ];
 then
-    echo "reference is not in fasta format"
-    exit
-fi
+    echo "reference is not in fasta format";
+    exit;
+fi;
 
 
 
 # Save prefix to be used to call files
-prefix=${reads1%%_*}
-prefix_reference=${reference%%.*}
+prefix=${reads1%%_*};
+prefix_reference=${reference%%.*};
 
 
 
@@ -104,23 +104,23 @@ prefix_reference=${reference%%.*}
 #---------------------#
 
 # Compress reads if not compressed
-if [ "${reads1##*.}" != "gz" ]
+if [ "${reads1##*.}" != "gz" ];
 then
-    echo "Compressing reads..."
-    gzip ${reads1}
-    reads1=${reads1}.gz
+    echo "Compressing reads...";
+    gzip ${reads1};
+    reads1=${reads1}.gz;
 
-elif [ "${reads2##*.}" != "gz" ]
+elif [ "${reads2##*.}" != "gz" ];
 then
-    echo "Compressing reads..."
-    gzip ${reads2}
-    reads2=${reads2}.gz
-fi
+    echo "Compressing reads...";
+    gzip ${reads2};
+    reads2=${reads2}.gz;
+fi;
 
 
 # Trim adapters from reads
-echo "Trimming reads..."
-fastq-mcf -o ${prefix}_trimmed_1.fastq.gz -o ${prefix}_trimmed_2.fastq.gz ${adapters} ${reads1} ${reads2}
+echo "Trimming reads...";
+fastq-mcf -o ${prefix}_trimmed_1.fastq.gz -o ${prefix}_trimmed_2.fastq.gz ${adapters} ${reads1} ${reads2};
 
 
 
@@ -130,30 +130,30 @@ fastq-mcf -o ${prefix}_trimmed_1.fastq.gz -o ${prefix}_trimmed_2.fastq.gz ${adap
 #---------#
 
 # Build reference index
-echo "Building reference index..."
-bowtie2-build --threads ${threads} ${reference} ${prefix_reference}
+echo "Building reference index...";
+bowtie2-build --threads ${threads} ${reference} ${prefix_reference};
 
 # Align
-echo "Mapping reads..."
-bowtie2 -p ${threads} -x ${prefix_reference} -1 ${prefix}_trimmed_1.fastq.gz -2 ${prefix}_trimmed_2.fastq.gz | samtools view -@ ${threads} -b -o ${prefix}.bam -
+echo "Mapping reads...";
+bowtie2 -p ${threads} -x ${prefix_reference} -1 ${prefix}_trimmed_1.fastq.gz -2 ${prefix}_trimmed_2.fastq.gz | samtools view -@ ${threads} -b -o ${prefix}.bam -;
 
 # Sort bam file by position
-echo "Sorting reads..."
-samtools sort -@ ${threads} -o ${prefix}.sort.bam ${prefix}.bam
-rm ${prefix}.bam
+echo "Sorting reads...";
+samtools sort -@ ${threads} -o ${prefix}.sort.bam ${prefix}.bam;
+rm ${prefix}.bam;
 
 # Reads extraction
-echo "Extracting mapped reads..."
-samtools view -@ ${threads} -b -F 4 -o ${prefix}_mapped.sort.bam ${prefix}.sort.bam
+echo "Extracting mapped reads...";
+samtools view -@ ${threads} -b -F 4 -o ${prefix}_mapped.sort.bam ${prefix}.sort.bam;
 
 # Convert mapped reads into fastq
-echo "Converting mapped reads into fastq file..."
-samtools fastq -@ ${threads} -1 ${prefix}_mapped_1.fastq.gz -2 ${prefix}_mapped_2.fastq.gz -c 6 -N ${prefix}_mapped.sort.bam
+echo "Converting mapped reads into fastq file...";
+samtools fastq -@ ${threads} -1 ${prefix}_mapped_1.fastq.gz -2 ${prefix}_mapped_2.fastq.gz -c 6 -N ${prefix}_mapped.sort.bam;
 
 # Compute the coverage
-echo "Computing coverage..."
-samtools faidx ${reference}
-bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${prefix_reference}.fai > ${prefix}_mapped.covbed.txt
+echo "Computing coverage...";
+samtools faidx ${reference};
+bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${prefix_reference}.fai > ${prefix}_mapped.covbed.txt;
 
 
 
@@ -163,18 +163,18 @@ bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${prefix_reference}
 #-------------------#
 
 # Perform assembly with different k
-for k in $(seq 17 8 99)
+for k in $(seq 17 8 99);
 do
-    mkdir k$k
-    abyss-pe -C k$k name=${prefix} k=$k in="../${prefix}_mapped_1.fastq.gz ../${prefix}_mapped_2.fastq.gz"
-done
+    mkdir k$k;
+    abyss-pe -C k$k name=${prefix} k=$k in="../${prefix}_mapped_1.fastq.gz ../${prefix}_mapped_2.fastq.gz";
+done;
 
 # Print table with results from all the k
-echo "These are the assembly stats resulting from different k:"
-/usr/lib/abyss/abyss-fac k*/*unitigs.fa
+echo "These are the assembly stats resulting from different k:";
+/usr/lib/abyss/abyss-fac k*/*unitigs.fa;
 
-printf "Input the best k value: "
-read k
+printf "Input the best k value: ";
+read k;
 
 
 
@@ -182,18 +182,18 @@ read k
 #----------#
 # Sampling #
 #----------#
-echo "Preforming the sampling..."
+echo "Preforming the sampling...";
 
-mkdir samples
+mkdir samples;
 
-for size in "${samples[@]}"
+for size in "${samples[@]}";
 do
-    size_name="$((size/1000))K"
-    seqtk sample -s1000 ${prefix}_mapped_1.fastq.gz ${size} > samples/${prefix}_${size_name}_1.fastq
-    gzip samples/${prefix}_${size_name}_1.fastq
-    seqtk sample -s1000 ${prefix}_mapped_2.fastq.gz ${size} > samples/${prefix}_${size_name}_2.fastq
-    gzip samples/${prefix}_${size_name}_2.fastq
-done
+    size_name="$((size/1000))K";
+    seqtk sample -s1000 ${prefix}_mapped_1.fastq.gz ${size} > samples/${prefix}_${size_name}_1.fastq;
+    gzip samples/${prefix}_${size_name}_1.fastq;
+    seqtk sample -s1000 ${prefix}_mapped_2.fastq.gz ${size} > samples/${prefix}_${size_name}_2.fastq;
+    gzip samples/${prefix}_${size_name}_2.fastq;
+done;
 
 
 
@@ -202,18 +202,18 @@ done
 # Assembly #
 #----------#
 
-mkdir Abyss
-cd Abyss
+mkdir Abyss;
+cd Abyss;
 
-echo "Assembling with ABySS..."
-for size in "${samples[@]}"
+echo "Assembling with ABySS...";
+for size in "${samples[@]}";
 do
-    size_name="$((size/1000))K"
-    mkdir ${size_name}
-    cd ${size_name}
-    abyss-pe name="${prefix}_${size_name}" k=$k in="../../samples/${prefix}_${size_name}_1.fastq.gz ../../samples/${prefix}_${size_name}_2.fastq.gz"
-    cd ..
-done
+    size_name="$((size/1000))K";
+    mkdir ${size_name};
+    cd ${size_name};
+    abyss-pe name="${prefix}_${size_name}" k=$k in="../../samples/${prefix}_${size_name}_1.fastq.gz ../../samples/${prefix}_${size_name}_2.fastq.gz";
+    cd ..;
+done;
 
 
 
@@ -222,7 +222,7 @@ done
 # Results #
 #---------#
 
-/usr/lib/abyss/abyss-fac *K/*scaffolds.fa > assemblies_stats.txt
+/usr/lib/abyss/abyss-fac *K/*scaffolds.fa > assemblies_stats.txt;
 
 
 
@@ -230,5 +230,5 @@ done
 #------#
 # Exit #
 #------#
-cd ..
+cd ..;
 
