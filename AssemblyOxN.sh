@@ -103,10 +103,10 @@ done;
 
 echo "Assembling with canu...";
 
+genomeSize=$(tail -n +2 ${reference} | tr -d "\n" | wc -m);
+
 mkdir canu;
 cd canu;
-
-genomeSize=$(tail -n +2 ${reference} | tr -d "\n" | wc -m);
 
 for size in "${samples[@]}";
 do
