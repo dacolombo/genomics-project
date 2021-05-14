@@ -111,7 +111,7 @@ cd canu;
 for size in "${samples[@]}";
 do
   canu -d "canu$((size/1000))K" -p "${prefix}_$((size/1000))K" genomeSize=${genomeSize} -nanopore ../samples/${prefix}_$((size/1000))K.fastq.gz;
-  FastaSeqStats canu$((size/1000))K/${prefix}_$((size/1000))K.contigs.fasta > canu_$((size/1000))K_stats.txt;
+  FastaSeqStats -i canu$((size/1000))K/${prefix}_$((size/1000))K.contigs.fasta > canu_$((size/1000))K_stats.txt;
 done;
 
 
