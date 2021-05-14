@@ -30,8 +30,9 @@ Help()
 ########################################
 
 
-samples=(25000 55000 11000 192500 275000 410000 550000);
 
+k_values=$(seq 17 8 99);
+samples=(25000 55000 11000 192500 275000 410000 550000);
 
 
 
@@ -163,7 +164,7 @@ bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${prefix_reference}
 #-------------------#
 
 # Perform assembly with different k
-for k in $(seq 17 8 99);
+for k in ${k_values};
 do
     mkdir k$k;
     abyss-pe -C k$k name=${prefix} k=$k in="../${prefix}_mapped_1.fastq.gz ../${prefix}_mapped_2.fastq.gz";
