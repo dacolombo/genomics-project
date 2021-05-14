@@ -84,7 +84,8 @@ gzip ${prefix}_mapped.fastq;
 
 echo "Computing coverage..."
 samtools faidx ${reference}
-bedtools genomecov -pc -d -ibam ${prefix}_mapped.sort.bam -g ${reference%%.*}.fai > ${prefix}_mapped.covbed.txt;
+bedtools genomecov -d -ibam ${prefix}_mapped.sort.bam -g ${reference%%.*}.fai > ${prefix}_mapped.covbed.txt;
+
 
 #----------#
 # Assembly #
