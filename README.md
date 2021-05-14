@@ -1,9 +1,12 @@
 # Genomics Project scripts
 A collection of scripts used to perform a chloroplast genome assembly for a project of the Genomics course:
+- [AssemblyIllumina](https://github.com/dacolombo/genomics-project#assemblyillumina)
+- [AssemblyOxN](https://github.com/dacolombo/genomics-project#assemblyoxn)
+- [SingleFastaTrim](https://github.com/dacolombo/genomics-project#singlefastatrim)
 
 # AssemblyIllumina
 This script performs trimming, mapping to a reference and assembly of the mapped reads. The reads used as input must be Illumina paired end reads.\
-The script will use:
+The script uses:
 - **fastq-mcf** to perform adapters trimming and quality filtering;
 - **bowtie2** to map the reads on the reference;
 - **ABySS** to perform the assembly of the mapped reads.
@@ -18,7 +21,7 @@ The inputs needed to make the script function properly are:
 - `-r`: file containing the reference genome. It has to be in .fasta format;
 - `-t`: integer indicating the number of threads to be used.
 
-Right before the assembly, different k values are used to then ask the user what is the optimal one. Predefined values are inserted in the script in the variable `k_values` based on a specific project. To change them, modify *line 34* accordingly.
+Right before the assembly, different k values are used to then ask the user what is the optimal one. Predefined values are inserted in the script in the variable `k_values` based on a specific project. To change them, modify *line 34* accordingly.\
 Sampling of the mapped reads is performed in order to obtain the optimal assembly. Predefined values are inserted in the script in the variable `samples` based on a specific project. To change them, modify *line 35* accordingly.
 
 
